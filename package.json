@@ -5,5 +5,8 @@
   "scripts": {
     "dev": "vercel dev",
     "deploy": "vercel --prod"
+  },
+  "devDependencies": {
+    "global-agent": "^4.1.3"
   }
 }

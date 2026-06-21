@@ -3,7 +3,7 @@
 
 const WORKER_URL = 'https://stock-api.xiaopan-369.workers.dev';
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -13,12 +13,17 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // 转发到 Worker
-  const params = new URLSearchParams(req.query).toString();
-  const workerPath = `/api/${req.query.action || 'health'}`;
-  const targetUrl = `${WORKER_URL}${workerPath}${params ? '?' + params : ''}`;
+  const { action, tickers, keyword } = req.query;
 
   try {
+    if (!action || action === 'health') {
+      return res.status(200).json({ status: 'ok', app: '盈迹Board' });
+    }
+
+    // 转发到 Worker
+    const params = new URLSearchParams(req.query).toString();
+    const targetUrl = `${WORKER_URL}/api/${action}${params ? '?' + params : ''}`;
+
     const fetchOptions = {
       method: req.method,
       headers: { 'Content-Type': 'application/json' },
@@ -35,4 +40,4 @@ export default async function handler(req, res) {
   } catch (err) {
     return res.status(502).json({ error: 'Worker unreachable', detail: err.message });
   }
-}
+};
