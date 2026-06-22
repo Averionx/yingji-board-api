@@ -108,7 +108,7 @@ export default async function handler(req, res) {
       if (!domain) return res.status(400).json({ error: 'missing domain' });
 
       try {
-        const logoResp = await fetch(`https://icon.horse/icon/${domain}`, {
+        const logoResp = await fetch(`https://www.google.com/s2/favicons?domain=${domain}&sz=128`, {
           headers: { 'User-Agent': 'Mozilla/5.0' },
           redirect: 'follow',
         });
