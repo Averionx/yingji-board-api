@@ -92,6 +92,32 @@ export default async function handler(req, res) {
       });
     }
 
+    // 常用外汇行情
+    if (action === 'forex') {
+      const resp = await fetch('https://open.er-api.com/v6/latest/USD');
+      const json = await resp.json();
+      const rates = json?.rates || {};
+      const usdCny = Number(rates.CNY);
+      const usdHkd = Number(rates.HKD);
+      const eur = Number(rates.EUR);
+      const jpy = Number(rates.JPY);
+
+      if (!usdCny || !usdHkd || !eur || !jpy) {
+        return res.status(502).json({ error: 'forex unavailable' });
+      }
+
+      return res.json({
+        data: [
+          { symbol: 'USD/CNY', name: '美元/人民币', rate: usdCny },
+          { symbol: 'USD/HKD', name: '美元/港币', rate: usdHkd },
+          { symbol: 'HKD/CNY', name: '港币/人民币', rate: usdCny / usdHkd },
+          { symbol: 'EUR/USD', name: '欧元/美元', rate: 1 / eur },
+          { symbol: 'USD/JPY', name: '美元/日元', rate: jpy },
+        ],
+        updatedAt: Date.now(),
+      });
+    }
+
     // 测试推送
     if (action === 'test-push') {
       const title = encodeURIComponent('盈迹Board 测试推送');
@@ -121,7 +147,7 @@ export default async function handler(req, res) {
         const contentType = logoResp.headers.get('content-type') || 'image/png';
 
         res.setHeader('Content-Type', contentType);
-        res.setHeader('Cache-Control', 'public, max-age=86400');
+        res.setHeader('Cache-Control', 'no-cache, max-age=0');
         return res.send(Buffer.from(buffer));
       } catch (e) {
         return res.status(502).json({ error: 'logo fetch failed' });
