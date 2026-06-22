@@ -108,7 +108,7 @@ export default async function handler(req, res) {
       if (!domain) return res.status(400).json({ error: 'missing domain' });
 
       try {
-        const logoResp = await fetch(`https://unavatar.io/${domain}`, {
+        const logoResp = await fetch(`https://icon.horse/icon/${domain}`, {
           headers: { 'User-Agent': 'Mozilla/5.0' },
           redirect: 'follow',
         });
